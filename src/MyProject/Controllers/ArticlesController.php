@@ -4,6 +4,7 @@ namespace MyProject\Controllers;
 
 use MyProject\Models\Articles\Article;
 use Myproject\View\View;
+use MyProject\Models\Users\User;
 
 class ArticlesController
 {
@@ -14,14 +15,54 @@ class ArticlesController
         $this->view = new View(__DIR__ . "/../../templates");
     }
 
-    public function view(int $articleId)
+    public function view(int $articleId): void
     {
         $article = Article::getById($articleId);
+
+        if ($article === null) {
+            $this->view->renderHtml("error/404.php", [], "Page not found", 404);
+            return;
+        }
+        $this->view->renderHtml("articles/view.php", ["article" => $article]);
+    }
+
+    public function edit(int $articleId): void
+    {
+        $article = Article::getById($articleId);
+
         if ($article === null) {
             $this->view->renderHtml("error/404.php", [], "Page not found", 404);
             return;
         }
 
-        $this->view->renderHtml("articles/view.php", ["article" => $article]);
+        $article->setName("Новое название статьи");
+        $article->setText("Новый текст статьи");
+
+        $article->save();
+    }
+
+    public function add(): void
+    {
+        $author = User::getById(1);
+
+        $article = new Article();
+        $article->setAuthor($author);
+        $article->setName("Новое название статьи");
+        $article->setText("Новый текст статьи");
+
+        $article->save();
+    }
+
+    public function delete(int $articleId): void
+    {
+        $article = Article::getById($articleId);
+
+        if ($article === null) {
+            echo "Статьи с таким Id не найдено";
+            return;
+        }
+
+        $article->delete();
+        var_dump($article);
     }
 }

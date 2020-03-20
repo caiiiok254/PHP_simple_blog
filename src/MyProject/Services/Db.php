@@ -20,6 +20,11 @@ class Db
         $this->pdo->exec("SET NAMES UTF8");
     }
 
+    public function getLastInsertId(): int
+    {
+        return (int) $this->pdo->lastInsertId();
+    }
+
     public function query(string $sql, $params = [], string $className = "stdClass"): ?array
     {
         $sth = $this->pdo->prepare($sql);
