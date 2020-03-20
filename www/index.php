@@ -1,30 +1,31 @@
 <?php
 //Front controller
-spl_autoload_register(function (string $className) {
-    require_once __DIR__ . '/../src/' . $className . '.php';
-});
-
-$route = $_GET["route"] ?? "";
-$routes = require __DIR__ . "/../src/routes.php";
-
-$isRouteFound = false;
-foreach ($routes as $pattern => $controllerAndAction) {
-    preg_match($pattern, $route, $matches);
-    if (!empty($matches)) {
-        $isRouteFound = true;
-        break;
+try {
+    spl_autoload_register(function (string $className) {
+        require_once __DIR__ . '/../src/' . $className . '.php';
+    });
+    $route = $_GET["route"] ?? "";
+    $routes = require __DIR__ . "/../src/routes.php";
+    $isRouteFound = false;
+    foreach ($routes as $pattern => $controllerAndAction) {
+        preg_match($pattern, $route, $matches);
+        if (!empty($matches)) {
+            $isRouteFound = true;
+            break;
+        }
     }
+    if (!$isRouteFound) {
+        throw new \MyProject\Exceptions\NotFoundException();
+    }
+    unset($matches[0]);
+    $controllerName = $controllerAndAction[0];
+    $actionName = $controllerAndAction[1];
+    $controller = new $controllerName();
+    $controller->$actionName(...$matches);
+} catch (\MyProject\Exceptions\DbException $e) {
+    $view = new \Myproject\View\View(__DIR__ . "/../src/templates/error");
+    $view->renderHtml("500.php", ["error" => $e->getMessage()], "Сайт недоступен", 500);
+} catch (\MyProject\Exceptions\NotFoundException $e) {
+    $view = new \Myproject\View\View(__DIR__ . "/../src/templates/error");
+    $view->renderHtml("404.php", ["error" => $e->getMessage()], "Страница не найдена", 404);
 }
-
-if (!$isRouteFound) {
-    echo "404 Page not found";
-    return;
-}
-
-unset($matches[0]);
-
-$controllerName = $controllerAndAction[0];
-$actionName = $controllerAndAction[1];
-
-$controller = new $controllerName();
-$controller->$actionName(...$matches);
