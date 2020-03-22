@@ -52,10 +52,12 @@ abstract class ActiveRecordEntity
 
     private function update(array $mappedProperties): void
     {
+        $filteredProperties = array_filter($mappedProperties);
+
         $columns2params = [];
         $params2values = [];
         $index = 1;
-        foreach ($mappedProperties as $column => $value) {
+        foreach ($filteredProperties as $column => $value) {
             $param = ":param" . $index;
             $columns2params[] = $column . " = " . $param;
             $params2values[":param" . $index] = $value;
