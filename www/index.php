@@ -28,4 +28,10 @@ try {
 } catch (\MyProject\Exceptions\NotFoundException $e) {
     $view = new \Myproject\View\View(__DIR__ . "/../src/templates/error");
     $view->renderHtml("404.php", ["error" => $e->getMessage()], "Страница не найдена", 404);
+} catch (\MyProject\Exceptions\UnauthorizedException $e) {
+    $view = new \MyProject\View\View(__DIR__ . "/../src/templates/error");
+    $view->renderHtml("401.php", ["error" => $e->getMessage()], "Вы не авторизованы", 401);
+} catch (\MyProject\Exceptions\ForbiddenException $e) {
+    $view = new \MyProject\View\View(__DIR__ . "/../src/templates/error");
+    $view->renderHtml("403.php", ["error" => $e->getMessage()], "У вас нет прав на это действие", 403);
 }

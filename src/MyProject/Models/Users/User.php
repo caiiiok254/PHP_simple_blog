@@ -126,6 +126,11 @@ class User extends ActiveRecordEntity
         return $this->authToken;
     }
 
+    public function getRole(): string
+    {
+        return $this->role;
+    }
+
     protected static function getTableName(): string
     {
         return "users";
